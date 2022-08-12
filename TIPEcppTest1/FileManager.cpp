@@ -38,7 +38,7 @@ vector<vector<string>> FileManager::read_file(string filename, bool EnableCout)
 			}
 			else if (wordNum != wordList.size())
 			{
-				cout << "ERROR: File word count per line is not consistent!" << endl;
+				cerr << "ERROR: File word count per line is not consistent!" << endl;
 			}
 
 			if (EnableCout) { cout << myLine << endl; }
@@ -47,6 +47,11 @@ vector<vector<string>> FileManager::read_file(string filename, bool EnableCout)
 		}
 		return lineList;
 		file.close();
+	}
+	else
+	{
+		cerr << "ERROR: Unable to read file" << endl;
+		return vector<vector<string>> {};
 	}
 }
 
@@ -63,7 +68,7 @@ float** FileManager::read_standardized_csv(vector<vector<string>> lines, bool En
 	{
 		int i = std::stoi(lines[p][0]);
 		int j = std::stoi(lines[p][1]);
-		Distance[i][j] = std::stod(lines[p][3]);
+		Distance[i][j] = std::stof(lines[p][3]);
 		if (EnableCout)
 		{
 			cout << "i: " << i << " j: " << j << " dist: " << std::stod(lines[p][3]) << endl;

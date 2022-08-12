@@ -14,7 +14,7 @@ public:
 	/// <param name="filename">The path to find the csv file</param>
 	/// <param name="EnableCout">Enable debug output to console</param>
 	/// <returns>A list of lines containing a list of words</returns>
-	static vector<vector<string>> read_file(string filename, bool EnableCout);
+	static vector<vector<string>> read_file(string filename, bool EnableCout = false);
 
 	/// <summary>
 	/// This is a parser, parses the wanted csv file to retrieve the wanted matrices
@@ -22,5 +22,5 @@ public:
 	/// <param name="lines">The csv files, already organized</param>
 	/// <param name="EnableCout">Enable debug output to console</param>
 	/// <returns>A matrix containing the data of the csv</returns>
-	static float** read_standardized_csv(vector<vector<string>> lines, bool EnableCout);
+	static float** read_standardized_csv(vector<vector<string>> lines, bool EnableCout = false);
 };
