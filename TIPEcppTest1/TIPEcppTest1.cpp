@@ -55,7 +55,7 @@ vector<vector<int>> CalculateSubtours(map<int, int> G1)
 	{
 		if (i == -1) i = i0.first;
 		Visited[i0.first] = (i0.first == 0);
-		cout << "Visited[" << i0.first << "]=" << (i0.first == 0) << endl;
+		//cout << "Visited[" << i0.first << "]=" << (i0.first == 0) << endl;
 	}
 	// While there exists i ∈ V1\{0} with Visited[i] == false do
 	while (ContainsValue(Visited, false))
@@ -64,7 +64,6 @@ vector<vector<int>> CalculateSubtours(map<int, int> G1)
 		i = GetNextValue(G1, i);
 		if (!Visited[i])
 		{
-			cout << "=====" << endl;
 			//cout << "i: " << i << " Visited count: " << Visited.count(i) << " bool: " << Visited[i] << endl;
 			// start <- i , S <- {i}
 			int start = i;
@@ -110,7 +109,9 @@ vector<vector<int>> CalculateSubtours(map<int, int> G1)
 // is satisfied. If not then it adds the violated constraint as lazy constraint.
 ILOLAZYCONSTRAINTCALLBACK2(LazyCallback, NumVar2D, Xmatrix, IloInt, n)
 {
+	auto start_lazy = chrono::high_resolution_clock::now();
 	map<int, int> G1;
+	cout << "===================" << endl;
 	cout << "Lazy here!" << endl;
 	for (int i = 0; i < n; i++)
 	{
@@ -164,36 +165,64 @@ ILOLAZYCONSTRAINTCALLBACK2(LazyCallback, NumVar2D, Xmatrix, IloInt, n)
 			}
 		}
 	}
+	auto end_lazy = chrono::high_resolution_clock::now();
+	auto ElapsedLazy = chrono::duration_cast<chrono::milliseconds>(end_lazy - start_lazy);
 
-	//IloInt const nbLocations = used.getSize();
-	//IloInt const nbClients = supply.getSize();
-	//for (IloInt j = 0; j < nbLocations; ++j)
-	//{
-	//	IloNum isUsed = getValue(used[j]);
-	//	IloNum served = 0.0; // Number of clients currently served from j
-	//	for (IloInt c = 0; c < nbClients; ++c)
-	//		served += getValue(supply[c][j]);
-	//	if (served > (nbClients - 1.0) * isUsed + EPS)
-	//	{
-	//		IloNumExpr sum = IloExpr(getEnv());
-	//		for (IloInt c = 0; c < nbClients; ++c)
-	//			sum += supply[c][j];
-	//		sum -= (nbClients - 1) * used[j];
-	//		cout << "Adding lazy capacity constraint " << sum << " <= 0" << endl;
-	//		add(sum <= 0.0).end();
-	//	}
-	//}
-	cout << "end lazy" << endl;
+	cout << "End of Lazy Callback, time elapsed(ms): " << ElapsedLazy.count() << endl;
 }
 #pragma endregion
 
-/*IloExtractable->IloRangeBase->IloRange*/
-int main()
+void usage(char* progname)
 {
+	cerr << "Usage:\t" << progname << " [-h] [csv_filename]" << endl;
+	cerr << " -h: Prints this help menu" << endl;
+	cerr << " filename: C.Murray's CSVs data file" << endl;
+	cerr << "           File ../../../20170608T121355407419/tbl_truck_travel_data_PG.csv"
+		<< " used if no name is provided." << endl;
+}
+
+int main(int argc, char** argv)
+{
+#pragma region ArgumentsParsing
+	string filename;
+	// The name "_.exe" counts as the first argument
+	switch (argc)
+	{
+	case 2:
+		cout << "argv[1]: " << argv[1] << endl;
+		if (argv[1][0] == '-' && argv[1][1] == 'h')
+		{
+			usage(argv[0]);
+			throw;
+		}
+		else
+		{
+			filename = argv[1];
+		}
+		break;
+	case 3:
+		if (argv[1][0] == '-' && argv[1][1] == 'h')
+		{
+			usage(argv[0]);
+		}
+		else
+		{
+			usage(argv[0]);
+			throw;
+		}
+		filename = argv[2];
+		break;
+	default:
+		usage(argv[0]);
+		filename = "C:\\Users\\marcb\\Downloads\\20170608T121355407419\\tbl_truck_travel_data_PG.csv";
+		break;
+	}
+#pragma endregion
+
 #pragma region DataSetup
 	auto start_0 = chrono::high_resolution_clock::now();
 
-	auto func_out = FileManager::read_file("C:\\Users\\marcb\\Downloads\\20170608T121355407419\\tbl_truck_travel_data_PG.csv");
+	auto func_out = FileManager::read_file(filename);
 	//Stops
 	const int n = sqrt(func_out.size() - 1);
 	cout << "n: " << n << endl;
@@ -374,6 +403,7 @@ int main()
 		double objective = cplex.getObjValue();
 
 		//Solving output
+		map<int, int> G;
 		cout << "Solution (" << cplex.getStatus() << ") with objective " << objective << endl;
 		for (int i = 0; i < n; i++)
 		{
@@ -383,7 +413,27 @@ int main()
 				if (value == 1)
 				{
 					cout << i << "->" << j << endl;
+					G[i] = j;
 				}
+			}
+		}
+		ofstream file;
+		file.open("Results.txt", std::ios::app);
+		if (file.is_open())
+		{
+			file << endl;
+			file << "==========DONE==========" << endl;
+			file << "Total elapsed time(ms) : " << ElapsedTotal.count() << endl;
+			file << "|\tSetup elapsed time(ms): " << ElapsedSetup.count() << endl;
+			file << "|\tSolving elapsed time(ms): " << ElapsedSolving.count() << endl;
+			file << "Solution (" << cplex.getStatus() << ") with objective " << objective << endl;
+			int i = 0;
+			file << i << " → " << G[i];
+			i = G[i];
+			while (i != 0)
+			{
+				i = G[i];
+				file << " → " << i;
 			}
 		}
 	}
