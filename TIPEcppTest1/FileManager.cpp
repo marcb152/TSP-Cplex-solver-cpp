@@ -55,7 +55,7 @@ vector<vector<string>> FileManager::read_file(string filename, bool EnableCout)
 	}
 }
 
-float** FileManager::read_standardized_csv(vector<vector<string>> lines, bool EnableCout)
+float** FileManager::read_standardized_csv(vector<vector<string>> lines, bool useTime, bool EnableCout)
 {
 	//We define our dynamic matrix here
 	int row_colCount = int(sqrt(lines.size() - 1));
@@ -68,10 +68,10 @@ float** FileManager::read_standardized_csv(vector<vector<string>> lines, bool En
 	{
 		int i = std::stoi(lines[p][0]);
 		int j = std::stoi(lines[p][1]);
-		Distance[i][j] = std::stof(lines[p][3]);
+		Distance[i][j] = std::stof(lines[p][(useTime ? 2 : 3)]);
 		if (EnableCout)
 		{
-			cout << "i: " << i << " j: " << j << " dist: " << std::stod(lines[p][3]) << endl;
+			cout << "i: " << i << " j: " << j << " dist: " << Distance[i][j] << endl;
 		}
 	}
 	return Distance;

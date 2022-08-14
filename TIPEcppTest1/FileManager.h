@@ -22,5 +22,5 @@ public:
 	/// <param name="lines">The csv files, already organized</param>
 	/// <param name="EnableCout">Enable debug output to console</param>
 	/// <returns>A matrix containing the data of the csv</returns>
-	static float** read_standardized_csv(vector<vector<string>> lines, bool EnableCout = false);
+	static float** read_standardized_csv(vector<vector<string>> lines, bool useTime, bool EnableCout = false);
 };
