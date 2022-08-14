@@ -174,26 +174,34 @@ ILOLAZYCONSTRAINTCALLBACK2(LazyCallback, NumVar2D, Xmatrix, IloInt, n)
 
 void usage(char* progname)
 {
-	cerr << "Usage:\t" << progname << " [-h] [csv_filename]" << endl;
-	cerr << " -h: Prints this help menu" << endl;
-	cerr << " filename: C.Murray's CSVs data file" << endl;
+	cerr << "Usage:\t" << progname << " [-h] {0|1} [csv_filename]" << endl;
+	cerr << " -h: Prints this help menu and terminates the programm" << endl;
+	cerr << " 0: Uses distances to solve the Model (default)" << endl;
+	cerr << " 1: Uses times to solve the Model" << endl;
+	cerr << " csv_filename: C.Murray's CSVs data file" << endl;
 	cerr << "           File ../../../20170608T121355407419/tbl_truck_travel_data_PG.csv"
 		<< " used if no name is provided." << endl;
 }
 
 int main(int argc, char** argv)
 {
+	bool useTime = false;
 #pragma region ArgumentsParsing
 	string filename;
+	// Help menu and end of the programm
+	if (argc > 1 && argv[1][0] == '-' && argv[1][1] == 'h')
+	{
+		usage(argv[0]);
+		throw;
+	}
 	// The name "_.exe" counts as the first argument
 	switch (argc)
 	{
 	case 2:
-		cout << "argv[1]: " << argv[1] << endl;
-		if (argv[1][0] == '-' && argv[1][1] == 'h')
+		// One argument
+		if (argv[1][0] == '0' || argv[1][0] == '1')
 		{
-			usage(argv[0]);
-			throw;
+			useTime = (argv[1][0] == '0' ? false : true);
 		}
 		else
 		{
@@ -201,12 +209,14 @@ int main(int argc, char** argv)
 		}
 		break;
 	case 3:
-		if (argv[1][0] == '-' && argv[1][1] == 'h')
+		// Two arguments
+		if (argv[1][0] == '0' || argv[1][0] == '1')
 		{
-			usage(argv[0]);
+			useTime = (argv[1][0] == '0' ? false : true);
 		}
 		else
 		{
+			// Error in the first argument
 			usage(argv[0]);
 			throw;
 		}
@@ -228,7 +238,7 @@ int main(int argc, char** argv)
 	cout << "n: " << n << endl;
 	//Distances matrix, from 1..n
 	float** Distance = new float* [n];
-	Distance = FileManager::read_standardized_csv(func_out);
+	Distance = FileManager::read_standardized_csv(func_out, useTime);
 
 	/*vector<int> arg;
 	for (int i = 0; i < n; i++)
@@ -347,7 +357,7 @@ int main(int argc, char** argv)
 	// Solving
 	IloCplex cplex(Model);
 	// Export the model, useful for debugging
-	cplex.exportModel("model.lp");
+	cplex.exportModel("Model.lp");
 	// Set the output as stdout
 	cplex.setOut(std::cout);
 
@@ -393,7 +403,8 @@ int main(int argc, char** argv)
 	auto ElapsedSolving = chrono::duration_cast<chrono::milliseconds>(end - start_1);
 
 	cout << "==========DONE==========" << endl;
-	cout << "Total elapsed time(ms) : " << ElapsedTotal.count() << endl;
+	cout << (useTime ? "Time was used." : "Distance was used.") << endl;
+	cout << "Total elapsed time(ms): " << ElapsedTotal.count() << endl;
 	cout << "|\tSetup elapsed time(ms): " << ElapsedSetup.count() << endl;
 	cout << "|\tSolving elapsed time(ms): " << ElapsedSolving.count() << endl;
 
@@ -423,7 +434,8 @@ int main(int argc, char** argv)
 		{
 			file << endl;
 			file << "==========DONE==========" << endl;
-			file << "Total elapsed time(ms) : " << ElapsedTotal.count() << endl;
+			file << (useTime ? "Time was used." : "Distance was used.") << endl;
+			file << "Total elapsed time(ms): " << ElapsedTotal.count() << endl;
 			file << "|\tSetup elapsed time(ms): " << ElapsedSetup.count() << endl;
 			file << "|\tSolving elapsed time(ms): " << ElapsedSolving.count() << endl;
 			file << "Solution (" << cplex.getStatus() << ") with objective " << objective << endl;
@@ -450,14 +462,3 @@ int main(int argc, char** argv)
 	env.end();
 #pragma endregion
 }
-
-// Exécuter le programme : Ctrl+F5 ou menu Déboguer > Exécuter sans débogage
-// Déboguer le programme : F5 ou menu Déboguer > Démarrer le débogage
-
-// Astuces pour bien démarrer :
-//   1. Utilisez la fenêtre Explorateur de solutions pour ajouter des fichiers et les gérer.
-//   2. Utilisez la fenêtre Team Explorer pour vous connecter au contrôle de code source.
-//   3. Utilisez la fenêtre Sortie pour voir la sortie de la génération et d'autres messages.
-//   4. Utilisez la fenêtre Liste d'erreurs pour voir les erreurs.
-//   5. Accédez à Projet > Ajouter un nouvel élément pour créer des fichiers de code, ou à Projet > Ajouter un élément existant pour ajouter des fichiers de code existants au projet.
-//   6. Pour rouvrir ce projet plus tard, accédez à Fichier > Ouvrir > Projet et sélectionnez le fichier .sln.
