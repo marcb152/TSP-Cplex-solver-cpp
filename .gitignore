@@ -362,3 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /TIPEcppTest1/model.lp
+/TIPEcppTest1/Model.lp
+/TIPEcppTest1/Results.txt
+/TIPEcppTest1/Results.txt
+/TIPEcppTest1/Results_X.csv
+/TIPEcppTest1/Results.txt

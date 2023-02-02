@@ -1,8 +1,0 @@
-
-==========DONE==========
-Distance was used.
-Total elapsed time(ms): 383
-|	Setup elapsed time(ms): 1
-|	Solving elapsed time(ms): 382
-Solution (Optimal) with objective 51620.1
-0 → 6 → 4 → 2 → 3 → 8 → 5 → 7 → 1 → 0
