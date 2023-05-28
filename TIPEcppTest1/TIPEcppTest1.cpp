@@ -445,10 +445,16 @@ int main(int argc, char** argv)
 		file_X.open("Results_X.csv", std::ios::out);
 		if (file_X.is_open())
 		{
-			int i = 0;
+			int i = 1;
+			for (pair<int, int> i0 : G)
+			{
+				i = i0.first;
+				break;
+			}
 			file_X << i << "," << G[i];
+			int beginning = i;
 			i = G[i];
-			while (i != 0)
+			while (i != beginning)
 			{
 				i = G[i];
 				file_X << "," << i;
