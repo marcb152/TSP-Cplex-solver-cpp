@@ -439,15 +439,28 @@ int main(int argc, char** argv)
 			file << "|\tSetup elapsed time(ms): " << ElapsedSetup.count() << endl;
 			file << "|\tSolving elapsed time(ms): " << ElapsedSolving.count() << endl;
 			file << "Solution (" << cplex.getStatus() << ") with objective " << objective << endl;
-			int i = 0;
-			file << i << " → " << G[i];
+		}
+		file.close();
+		ofstream file_X;
+		file_X.open("Results_X.csv", std::ios::out);
+		if (file_X.is_open())
+		{
+			int i = 1;
+			for (pair<int, int> i0 : G)
+			{
+				i = i0.first;
+				break;
+			}
+			file_X << i << "," << G[i];
+			int beginning = i;
 			i = G[i];
-			while (i != 0)
+			while (i != beginning)
 			{
 				i = G[i];
-				file << " → " << i;
+				file_X << "," << i;
 			}
 		}
+		file_X.close();
 	}
 	else
 	{
